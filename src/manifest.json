@@ -1,0 +1,44 @@
+{
+  "Actions": [
+    {
+      "Icon": "assets/formIcon",
+      "Name": "Form Builder",
+      "States": [
+        {
+          "Image": "assets/formIcon",
+          "TitleAlignment": "middle",
+          "FontSize": "12"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Create and submit custom forms via HTTP API calls",
+      "UUID": "com.leandro-menezes.formbuilder.action",
+      "PropertyInspectorPath": "pi.html"
+    }
+  ],
+  "SDKVersion": 2,
+  "Author": "Leandro Menezes",
+  "CodePath": "FormBuilder.exe",
+  "CodePathWin": "FormBuilder.exe",
+  "Description": "Create custom forms and make HTTP API calls with configurable endpoints and output handling",
+  "Name": "Form Builder",
+  "Icon": "assets/formIcon",
+  "Category": "Forms",
+  "CategoryIcon": "assets/formIcon",
+  "URL": "https://github.com/leandro-menezes/stream-deck-form-builder",
+  "PropertyInspectorPath": "setup.html",
+  "Version": "1.0.0",
+  "OS": [
+    {
+        "Platform": "windows",
+        "MinimumVersion" : "10"
+    },
+    {
+        "Platform": "macos",
+        "MinimumVersion" : "10.15"
+    }
+  ],
+  "Software": {
+        "MinimumVersion" : "4.1"
+    }
+}

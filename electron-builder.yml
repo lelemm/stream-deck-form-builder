@@ -1,0 +1,33 @@
+appId: com.leandro-menezes.stream-deck-form-builder
+productName: Stream Deck Form Builder
+copyright: Copyright © 2024 Leandro Menezes
+
+directories:
+  output: dist-electron
+
+files:
+  - FormBuilder.exe.cjs
+  - preload.js
+  - form.html
+  - setup.html
+  - pi.html
+  - app.html
+  - manifest.json
+  - assets/
+  - css/
+
+win:
+  target:
+    - target: dir
+      arch: [x64]
+  icon: src/assets/formIcon.png
+
+# Explicitly disable all installer types
+nsis: false
+nsisWeb: false
+squirrelWindows: false
+msi: false
+forceCodeSigning: false
+
+# Disable auto-updater and other features that might need elevation
+publish: null

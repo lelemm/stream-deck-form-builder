@@ -1,0 +1,74 @@
+{
+  "title": "User Registration",
+  "url": "https://api.example.com/users",
+  "method": "POST",
+  "outputType": "modal",
+  "submitButtonText": "Register User",
+  "fields": [
+    {
+      "name": "username",
+      "label": "Username",
+      "description": "Choose a unique username",
+      "type": "text",
+      "required": true,
+      "sendAs": "body",
+      "placeholder": "Enter your username"
+    },
+    {
+      "name": "email",
+      "label": "Email Address",
+      "description": "We'll use this for account verification",
+      "type": "email",
+      "required": true,
+      "sendAs": "body",
+      "placeholder": "your.email@example.com"
+    },
+    {
+      "name": "password",
+      "label": "Password",
+      "description": "Minimum 8 characters",
+      "type": "password",
+      "required": true,
+      "sendAs": "body",
+      "placeholder": "Enter your password"
+    },
+    {
+      "name": "role",
+      "label": "User Role",
+      "description": "Select your role in the system",
+      "type": "select",
+      "required": true,
+      "sendAs": "body",
+      "options": [
+        {
+          "value": "user",
+          "label": "Regular User"
+        },
+        {
+          "value": "admin",
+          "label": "Administrator"
+        },
+        {
+          "value": "moderator",
+          "label": "Moderator"
+        }
+      ]
+    },
+    {
+      "name": "newsletter",
+      "label": "Subscribe to Newsletter",
+      "description": "Receive updates about new features",
+      "type": "checkbox",
+      "required": false,
+      "sendAs": "body"
+    },
+    {
+      "name": "api_key",
+      "label": "API Key",
+      "description": "Your authentication token",
+      "type": "password",
+      "required": true,
+      "sendAs": "query"
+    }
+  ]
+}

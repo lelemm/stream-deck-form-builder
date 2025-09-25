@@ -1,0 +1,66 @@
+{
+  "name": "stream-deck-form-builder",
+  "version": "1.0.0",
+  "description": "A Stream Deck plugin to create custom forms and make HTTP API calls",
+  "private": true,
+  "type": "module",
+  "main": "FormBuilder.exe.cjs",
+  "scripts": {
+    "dev": "vite build --mode development && npm run copy-assets",
+    "build": "vite build && npm run copy-assets",
+    "build-electron": "electron-builder --win dir",
+    "build-electron-dev": "electron-builder --win portable --publish=never",
+    "build-electron-docker": "./build-docker.sh",
+    "electron": "electron FormBuilder.exe.cjs",
+    "electron-dev": "ELECTRON_IS_DEV=true electron FormBuilder.exe.cjs",
+    "preview": "vite preview",
+    "copy-assets": "node scripts/copy-assets.js",
+    "package": "npm run build && npm run build-electron && node scripts/package.js",
+    "package-docker": "npm run build && ./build-docker.sh",
+    "package-only": "node scripts/package.js",
+    "test-docker": "./test-docker.sh",
+    "generate-manifest": "node scripts/generate-manifest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leandro-menezes/stream-deck-form-builder.git"
+  },
+  "keywords": [
+    "streamdeck",
+    "elgato",
+    "form",
+    "http",
+    "api"
+  ],
+  "author": "Leandro Menezes",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.6.4",
+    "fs-extra": "^11.2.0",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "vite": "^5.0.8"
+  },
+  "dependencies": {
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "axios": "^1.6.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.544.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "ws": "^8.14.2"
+  },
+  "optionalDependencies": {
+    "archiver": "^6.0.1"
+  }
+}

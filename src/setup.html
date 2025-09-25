@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Deck Form Builder - Setup</title>
+    <link rel="stylesheet" href="assets/setup.css">
+    <style>
+        /* Stream Deck Property Inspector styles */
+        body {
+            background: #2d2d30;
+            color: #cccccc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 13px;
+            margin: 0;
+            padding: 16px;
+            overflow-x: hidden;
+        }
+        
+        /* Custom scrollbar for Stream Deck theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #404040;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #666666;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #888888;
+        }
+        
+        /* Fix input field visibility for dark theme */
+        input, select, textarea, button {
+            background: #404040 !important;
+            color: #cccccc !important;
+            border: 1px solid #666666 !important;
+            border-radius: 4px !important;
+            padding: 6px 8px !important;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0078d4 !important;
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.3) !important;
+        }
+        
+        button {
+            background: #0078d4 !important;
+            color: white !important;
+            cursor: pointer !important;
+        }
+        
+        button:hover {
+            background: #106ebe !important;
+        }
+        
+        button:disabled {
+            background: #666666 !important;
+            cursor: not-allowed !important;
+        }
+        
+        /* Fix placeholder text */
+        input::placeholder, textarea::placeholder {
+            color: #999999 !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 text-gray-100">
+    <div id="root" class="min-h-screen"></div>
+    <script type="module" src="js/setup.js"></script>
+</body>
+</html>
