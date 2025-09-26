@@ -4,17 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stream Deck Form Builder - Setup</title>
-    <link rel="stylesheet" href="assets/setup.css">
+    <link rel="stylesheet" href="assets/app.css">
     <style>
         /* Stream Deck Property Inspector styles */
         body {
-            background: #2d2d30;
-            color: #cccccc;
+            background: radial-gradient(1200px circle at -200px -200px, #7c3aed 0%, #4c1d95 35%, #1b1340 100%);
+            background-attachment: fixed;
+            color: #e6e6f0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-size: 13px;
             margin: 0;
             padding: 16px;
             overflow-x: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Noise overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.06;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/%3E%3C/feTurbulence%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
         
         /* Custom scrollbar for Stream Deck theme */
@@ -37,42 +52,219 @@
         
         /* Fix input field visibility for dark theme */
         input, select, textarea, button {
-            background: #404040 !important;
-            color: #cccccc !important;
-            border: 1px solid #666666 !important;
-            border-radius: 4px !important;
+            background: rgba(255, 255, 255, 0.06) !important;
+            color: #f6f2ff !important;
+            border: 1px solid rgba(255,255,255,0.18) !important;
+            border-radius: 8px !important;
             padding: 6px 8px !important;
+            -webkit-backdrop-filter: blur(14px) saturate(1.2);
+            backdrop-filter: blur(14px) saturate(1.2);
         }
         
         input:focus, select:focus, textarea:focus {
-            border-color: #0078d4 !important;
+            border-color: rgba(168, 85, 247, 0.9) !important;
             outline: none !important;
-            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.3) !important;
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.35) !important;
         }
         
-        button {
-            background: #0078d4 !important;
+        button:not(.control-button) {
+            background: linear-gradient(180deg, rgba(168, 85, 247, 0.9), rgba(109, 40, 217, 0.9)) !important;
             color: white !important;
             cursor: pointer !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            box-shadow: 0 10px 25px rgba(31, 18, 77, 0.45), inset 0 1px 0 rgba(255,255,255,0.2);
         }
         
-        button:hover {
-            background: #106ebe !important;
+        button:not(.control-button):hover {
+            filter: brightness(1.05);
         }
         
-        button:disabled {
+        button:not(.control-button):disabled {
             background: #666666 !important;
             cursor: not-allowed !important;
         }
         
         /* Fix placeholder text */
         input::placeholder, textarea::placeholder {
-            color: #999999 !important;
+            color: #d6c7ff !important;
+        }
+        
+        /* Custom title bar for borderless window */
+        .title-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            background: rgba(124, 58, 237, 0.12);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            -webkit-app-region: drag;
+            z-index: 1000;
+            -webkit-backdrop-filter: blur(16px) saturate(1.35);
+            backdrop-filter: blur(16px) saturate(1.35);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 8px 32px rgba(0, 0, 0, 0.25);
+        }
+        
+        .window-title {
+            color: #f0e9ff;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .window-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            -webkit-app-region: no-drag;
+        }
+        
+        .control-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .control-button.minimize {
+            background: #ffbd2e;
+        }
+        
+        .control-button.close {
+            background: #ff5f57;
+        }
+        
+        .control-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .control-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Content area with padding for title bar */
+        #root {
+            margin-top: 32px;
+            padding: 12px;
         }
     </style>
 </head>
-<body class="bg-gray-800 text-gray-100">
-    <div id="root" class="min-h-screen"></div>
+<body class="dark bg-gray-800 text-gray-100">
+    <div class="title-bar">
+        <div class="window-title">Stream Deck Form Builder - Setup</div>
+        <div class="window-controls">
+            <button class="control-button minimize" onclick="minimizeWindow()"></button>
+            <button class="control-button close" onclick="closeWindow()"></button>
+        </div>
+    </div>
+    
+    <div id="root"></div>
+    
+    <script>
+        // Global state for form config that can be updated before React renders
+        window.globalFormConfig = {
+            title: '',
+            url: '',
+            method: 'POST',
+            outputType: 'status',
+            submitButtonText: 'Submit',
+            fields: [],
+            headers: [],
+            auth: {
+                type: 'none',
+                oauth: {
+                    authorizationUrl: '',
+                    tokenUrl: '',
+                    clientId: '',
+                    clientSecret: '',
+                    scope: '',
+                    authPlacement: 'header',
+                    redirectUrl: '',
+                    saveRefreshToken: false,
+                    token: null
+                },
+                clientCredentials: {
+                    tokenUrl: '',
+                    clientId: '',
+                    clientSecret: '',
+                    scope: '',
+                    authPlacement: 'header',
+                    token: null
+                }
+            }
+        }
+
+        // Global reference to React update function
+        window.updateSetupReact = null
+
+        // Initialize Stream Deck connection immediately (before React renders)
+        console.log('[Setup] Initializing Stream Deck connection from HTML')
+        
+        // Check if Electron API is available
+        if (window.electronAPI) {
+            console.log('Setup connecting to Stream Deck via Electron IPC')
+            
+            // Handle context data from main process
+            const handleContextData = (data) => {
+                console.log('Setup received context data:', data)
+                if (data && data.data && data.data.settings && data.data.settings.formBuilderConfig) {
+                    // Update global config immediately
+                    window.globalFormConfig = { ...window.globalFormConfig, ...data.data.settings.formBuilderConfig }
+                    // Update React if it's rendered
+                    if (window.updateSetupReact) {
+                        window.updateSetupReact(window.globalFormConfig)
+                    }
+                }
+                // Store context for saving
+                window.currentContext = data.context
+            }
+            
+            // Handle settings updates from main process
+            const handleSettingsUpdate = (message) => {
+                console.log('Setup received settings update:', message)
+                if (message.event === 'didReceiveSettings' && message.settings && message.settings.formBuilderConfig) {
+                    // Update global config immediately
+                    window.globalFormConfig = { ...window.globalFormConfig, ...message.settings.formBuilderConfig }
+                    // Update React if it's rendered
+                    if (window.updateSetupReact) {
+                        window.updateSetupReact(window.globalFormConfig)
+                    }
+                }
+            }
+
+            const handleRawMessage = (event, message) => {
+                console.log('[Setup] Raw message received:', message)
+            }
+            
+            // Set up IPC listeners
+            window.electronAPI.onSetupContextData(handleContextData)
+            window.electronAPI.onSetupSettingsUpdate(handleSettingsUpdate)
+            window.electronAPI.onRawMessage(handleRawMessage)
+            
+            console.log('[Setup] Stream Deck IPC listeners ready')
+            
+        } else {
+            console.log('Electron API not available')
+        }
+
+        function minimizeWindow() {
+            if (window.electronAPI) {
+                window.electronAPI.minimizeWindow()
+            }
+        }
+        
+        function closeWindow() {
+            if (window.electronAPI) {
+                window.electronAPI.closeWindow()
+            }
+        }
+    </script>
     <script type="module" src="js/setup.js"></script>
 </body>
 </html>

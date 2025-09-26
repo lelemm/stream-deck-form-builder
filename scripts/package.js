@@ -18,12 +18,16 @@ try {
 
 async function createPackage() {
   const pluginName = 'com.leandro-menezes.formbuilder.sdPlugin'
-  const electronOutputDir = path.join(__dirname, '..', 'dist-electron')
-  const pluginSourceDir = path.join(__dirname, '..', 'dist', pluginName)
+  const distDir = path.join(__dirname, '..', 'dist')
   const outputPath = path.join(__dirname, '..', 'release', `${pluginName}.streamDeckPlugin`)
 
   // Ensure release directory exists
   await fs.ensureDir(path.join(__dirname, '..', 'release'))
+
+  // Check if the dist directory exists
+  if (!await fs.pathExists(distDir)) {
+    throw new Error(`Dist directory not found: ${distDir}`)
+  }
 
   // Create the package
   const output = fs.createWriteStream(outputPath)
@@ -33,6 +37,7 @@ async function createPackage() {
 
   output.on('close', () => {
     console.log(`Plugin packaged successfully: ${archive.pointer()} bytes`)
+    console.log(`Package location: ${outputPath}`)
   })
 
   archive.on('error', (err) => {
@@ -41,15 +46,8 @@ async function createPackage() {
 
   archive.pipe(output)
 
-  // Add the plugin directory
-  archive.directory(pluginSourceDir, pluginName)
-
-  // Add the Electron executable if it exists
-  if (await fs.pathExists(path.join(electronOutputDir, 'FormBuilder.exe'))) {
-    archive.file(path.join(electronOutputDir, 'FormBuilder.exe'), {
-      name: `${pluginName}/FormBuilder.exe`
-    })
-  }
+  // Add all files from dist directory to the plugin directory
+  archive.directory(distDir, pluginName)
 
   archive.finalize()
 }

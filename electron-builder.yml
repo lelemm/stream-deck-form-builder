@@ -6,21 +6,23 @@ directories:
   output: dist-electron
 
 files:
-  - FormBuilder.exe.cjs
-  - preload.js
-  - form.html
-  - setup.html
-  - pi.html
-  - app.html
-  - manifest.json
-  - assets/
-  - css/
+  - "FormBuilder.exe.cjs"
+  - "preload.js"
+  - "*.html"
+  - "js/**/*"
+  - "css/**/*"
+  - "assets/**/*"
+  - "manifest.json"
+  - "node_modules/**/*"
+  - "!dist"
+  - "!dist-electron"
+  - "!src"
 
 win:
   target:
     - target: dir
       arch: [x64]
-  icon: src/assets/formIcon.png
+  icon: assets/formIcon.png
 
 # Explicitly disable all installer types
 nsis: false

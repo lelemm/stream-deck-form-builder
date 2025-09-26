@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import FormModal from './FormModal'
-import '../css/setup.css'
+import '../css/app.css'
 
 function App() {
   const [showModal, setShowModal] = useState(false)
@@ -15,10 +15,21 @@ function App() {
 
   const loadConfiguration = async () => {
     try {
-      // This would normally load from the Stream Deck plugin settings
-      const savedConfig = localStorage.getItem('formBuilderConfig')
-      if (savedConfig) {
-        setFormData(JSON.parse(savedConfig))
+      console.log('App: Requesting configuration from Electron main process')
+      
+      // Request current settings from Electron main process via IPC
+      if (window.electronAPI && window.electronAPI.getSettings) {
+        const settings = await window.electronAPI.getSettings()
+        console.log('App: Received settings from Electron:', settings)
+        if (settings) {
+          setFormData(settings)
+        }
+      } else {
+        console.log('App: electronAPI not available, using window.globalFormConfig fallback')
+        // Fallback to global config if available
+        if (window.globalFormConfig) {
+          setFormData(window.globalFormConfig)
+        }
       }
     } catch (err) {
       console.error('Error loading configuration:', err)
@@ -97,7 +108,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4">
+    <div className="bg-gray-900 text-white flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="bg-gray-800 rounded-lg shadow-lg p-6 text-center">
           <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">

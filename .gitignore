@@ -8,6 +8,7 @@ yarn-error.log*
 dist/
 release/
 build/
+dist-electron/
 
 # Environment variables
 .env
@@ -56,4 +57,5 @@ coverage/
 
 # Temporary folders
 tmp/
-temp/
+temp/src/js/setup*.js
+src/assets/app.css

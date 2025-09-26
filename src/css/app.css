@@ -63,6 +63,29 @@
   .sd-bg-surface {
     @apply bg-gray-700;
   }
+
+  /* Window control buttons (shared across setup.html and form.html) */
+  .control-button {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .control-button.minimize {
+    background: #ffbd2e;
+  }
+  .control-button.close {
+    background: #ff5f57;
+  }
+  .control-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  .control-button:active {
+    transform: scale(0.95);
+  }
 }
 
 /* Custom utilities for Stream Deck */
@@ -101,30 +124,31 @@
     --radius: 0.5rem;
   }
   .dark {
-    --background: 0 0% 3.9%;
+    /* Adjusted for purple gradient background: lighter foregrounds, cohesive accents */
+    --background: 260 65% 10%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
+    --card: 255 30% 14%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
+    --popover: 255 30% 14%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
+    --primary: 268 83% 67%; /* violet-500 */
+    --primary-foreground: 261 100% 98%;
+    --secondary: 252 10% 20%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --muted: 252 10% 24%;
+    --muted-foreground: 0 0% 75%;
+    --accent: 268 83% 67%;
+    --accent-foreground: 261 100% 98%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --border: 255 15% 28%;
+    --input: 255 15% 28%;
+    --ring: 268 83% 67%;
+    --chart-1: 268 83% 67%;
+    --chart-2: 291 70% 65%;
+    --chart-3: 220 70% 55%;
+    --chart-4: 160 60% 45%;
+    --chart-5: 43 96% 56%;
   }
 }
 

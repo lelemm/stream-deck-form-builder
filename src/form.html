@@ -3,695 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Builder - Submit Form</title>
+    <title>Stream Deck Form Builder - Submit Form</title>
+    <link rel="stylesheet" href="assets/app.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Window background - purple gradient with subtle noise overlay */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: transparent;
-            min-height: 100vh;
-            padding: 8px;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        .window-container {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
-            width: 100%;
-            height: calc(100vh - 16px);
-            overflow: hidden;
-            backdrop-filter: blur(20px);
+            background: radial-gradient(1200px circle at -200px -200px, #7c3aed 0%, #4c1d95 35%, #1b1340 100%);
+            background-attachment: fixed;
+            color: #e6e6f0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             position: relative;
         }
 
+        /* Noise overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.06;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/%3E%3C/feTurbulence%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* Custom title bar for borderless window */
         .title-bar {
-            -webkit-app-region: drag;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            height: 40px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            background: rgba(124, 58, 237, 0.12);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 16px;
-            border-radius: 16px 16px 0 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            -webkit-app-region: drag;
+            z-index: 1000;
+            -webkit-backdrop-filter: blur(16px) saturate(1.35);
+            backdrop-filter: blur(16px) saturate(1.35);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 8px 32px rgba(0, 0, 0, 0.25);
         }
 
         .window-title {
-            color: white;
-            font-size: 14px;
+            color: #f0e9ff;
+            font-size: 12px;
             font-weight: 500;
-            opacity: 0.9;
         }
 
         .window-controls {
-            -webkit-app-region: no-drag;
             display: flex;
+            align-items: center;
             gap: 8px;
+            -webkit-app-region: no-drag;
         }
 
         .control-button {
             width: 12px;
             height: 12px;
-            border-radius: 50%;
+            border-radius: 6px;
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8px;
-            color: transparent;
+        }
+
+        .control-button.minimize {
+            background: #ffbd2e;
+        }
+
+        .control-button.close {
+            background: #ff5f57;
         }
 
         .control-button:hover {
-            transform: scale(1.15);
-            color: rgba(0, 0, 0, 0.8);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transform: scale(1.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .control-button:active {
             transform: scale(0.95);
         }
 
-        .close-button {
-            background: #ff5f57;
-        }
-
-        .close-button:hover {
-            background: #ff4136;
-        }
-
-        .minimize-button {
-            background: #ffbd2e;
-        }
-
-        .minimize-button:hover {
-            background: #f5a623;
-        }
-
-        .container {
-            background: white;
-            border-radius: 0 0 16px 16px;
-            padding: 30px 40px;
-            height: calc(100% - 40px);
-            overflow-y: auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
-            font-weight: 600;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.2s ease;
-            background: white;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .form-group input[type="checkbox"] {
-            width: auto;
-            margin-right: 8px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-        }
-
-        .checkbox-group label {
-            margin-bottom: 0;
-            cursor: pointer;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e5e9;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            min-width: 100px;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-            transform: translateY(-1px);
-        }
-
-        .btn-primary:disabled {
-            background: #a0aec0;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #4a5568;
-        }
-
-        .btn-secondary:hover {
-            background: #cbd5e0;
-        }
-
-        .error {
-            background: #fed7d7;
-            color: #c53030;
+        /* Content area with padding for title bar */
+        #root {
+            margin-top: 32px;
             padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #c53030;
-        }
-
-        .success {
-            background: #c6f6d5;
-            color: #22543d;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #22543d;
-        }
-
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px 0;
-            color: #667eea;
-        }
-
-        .spinner {
-            border: 2px solid #e1e5e9;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .result-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .result-modal .container {
-            position: relative;
-            max-width: 700px;
-        }
-
-        .result-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #666;
-            cursor: pointer;
-        }
-
-        .result-content {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .result-content textarea {
-            width: 100%;
-            min-height: 200px;
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 14px;
-            background: #f8f9fa;
-        }
-
-        .copy-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .copy-btn:hover {
-            background: #5a67d8;
-        }
-
-        .copy-success {
-            color: #22543d;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-
-        .field-description {
-            color: #666;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .required {
-            color: #c53030;
-            margin-left: 2px;
-        }
-
-        .select-wrapper {
-            position: relative;
-        }
-
-        .select-wrapper select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 12px center;
-            background-repeat: no-repeat;
-            background-size: 16px;
-            padding-right: 40px;
         }
     </style>
 </head>
-<body>
-    <div class="window-container">
-        <div class="title-bar">
-            <div class="window-title">Stream Deck Form Builder</div>
-            <div class="window-controls">
-                <button class="control-button minimize-button" onclick="minimizeWindow()" title="Minimize">−</button>
-                <button class="control-button close-button" onclick="closeWindow()" title="Close">×</button>
-            </div>
-        </div>
-        
-        <div class="container">
-            <div class="header">
-                <h1 id="form-title">Loading Form...</h1>
-                <p id="form-description">Please wait while we load your form configuration</p>
-            </div>
-
-        <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <span>Loading form...</span>
-        </div>
-
-        <form id="form" style="display: none;">
-            <div id="form-fields">
-                <!-- Form fields will be populated here -->
-            </div>
-
-            <div class="form-actions">
-                <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
-                <button type="submit" id="submit-btn" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
-
-        <div id="error-message" class="error" style="display: none;"></div>
-        <div id="success-message" class="success" style="display: none;"></div>
-    </div>
-
-    <!-- Result Modal -->
-    <div id="result-modal" class="result-modal" style="display: none;">
-        <div class="container">
-            <button class="result-close" onclick="closeResultModal()">&times;</button>
-            <div class="header">
-                <h1>API Response</h1>
-                <p>The API call completed successfully</p>
-            </div>
-            <div class="result-content">
-                <textarea id="result-text" readonly></textarea>
-                <div style="text-align: right; margin-top: 10px;">
-                    <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
-                    <span id="copy-success" class="copy-success" style="display: none;">Copied!</span>
-                </div>
-            </div>
+<body class="dark">
+    <div class="title-bar">
+        <div class="window-title">Stream Deck Form Builder - Submit Form</div>
+        <div class="window-controls">
+            <button class="control-button minimize" onclick="minimizeWindow()"></button>
+            <button class="control-button close" onclick="closeWindow()"></button>
         </div>
     </div>
+
+    <div id="root"></div>
 
     <script>
-        let currentFormData = null
-        let isSubmitting = false
+        // Initialize Stream Deck connection immediately (before React renders)
+        console.log('[Form] Initializing Stream Deck connection from HTML')
 
-        // Listen for form settings from main process
-        window.electronAPI.onFormSettings((event, settings) => {
-            console.log('Received form settings:', settings)
-            currentFormData = settings
-            renderForm(settings)
-        })
-
-        // Listen for form submission results
-        window.electronAPI.onFormResult((event, result) => {
-            console.log('Form result:', result)
-            isSubmitting = false
-
-            const submitBtn = document.getElementById('submit-btn')
-            submitBtn.disabled = false
-            submitBtn.textContent = 'Submit'
-
-            if (result.success) {
-                showResultModal(JSON.stringify(result.data, null, 2))
-            } else {
-                showError('Form submission failed: ' + result.error)
-            }
-        })
-
-        function renderForm(settings) {
-            const title = document.getElementById('form-title')
-            const description = document.getElementById('form-description')
-            const form = document.getElementById('form')
-            const formFields = document.getElementById('form-fields')
-            const loading = document.getElementById('loading')
-
-            title.textContent = settings.title || 'Submit Form'
-            description.textContent = settings.description || 'Please fill out the form below'
-
-            formFields.innerHTML = ''
-
-            if (settings.fields && settings.fields.length > 0) {
-                settings.fields.forEach(field => {
-                    const formGroup = document.createElement('div')
-                    formGroup.className = 'form-group'
-
-                    const label = document.createElement('label')
-                    label.textContent = field.label
-                    if (field.required) {
-                        const requiredSpan = document.createElement('span')
-                        requiredSpan.className = 'required'
-                        requiredSpan.textContent = ' *'
-                        label.appendChild(requiredSpan)
-                    }
-                    formGroup.appendChild(label)
-
-                    if (field.description) {
-                        const desc = document.createElement('div')
-                        desc.className = 'field-description'
-                        desc.textContent = field.description
-                        formGroup.appendChild(desc)
-                    }
-
-                    let input
-                    switch (field.type) {
-                        case 'textarea':
-                            input = document.createElement('textarea')
-                            input.placeholder = field.placeholder || ''
-                            break
-                        case 'select':
-                            input = document.createElement('select')
-                            const placeholderOption = document.createElement('option')
-                            placeholderOption.value = ''
-                            placeholderOption.textContent = field.placeholder || 'Select an option'
-                            placeholderOption.disabled = true
-                            placeholderOption.selected = true
-                            input.appendChild(placeholderOption)
-
-                            if (field.options) {
-                                field.options.forEach(option => {
-                                    const optionElement = document.createElement('option')
-                                    optionElement.value = option.value
-                                    optionElement.textContent = option.label
-                                    input.appendChild(optionElement)
-                                })
-                            }
-                            break
-                        case 'checkbox':
-                            input = document.createElement('input')
-                            input.type = 'checkbox'
-                            formGroup.className = 'form-group checkbox-group'
-                            break
-                        default:
-                            input = document.createElement('input')
-                            input.type = field.type || 'text'
-                            input.placeholder = field.placeholder || ''
-                    }
-
-                    input.name = field.name
-                    input.required = field.required || false
-                    formGroup.appendChild(input)
-                    formFields.appendChild(formGroup)
-                })
-            }
-
-            loading.style.display = 'none'
-            form.style.display = 'block'
+        // Check if Electron API is available
+        if (window.electronAPI) {
+            console.log('Form connecting to Stream Deck via Electron IPC')
+            console.log('[Form] Stream Deck IPC listeners ready')
+        } else {
+            console.log('Electron API not available')
         }
 
-        document.getElementById('form').addEventListener('submit', async (e) => {
-            e.preventDefault()
-
-            if (isSubmitting) return
-
-            const formData = new FormData(e.target)
-            const values = {}
-
-            // Collect form values
-            for (let [key, value] of formData.entries()) {
-                values[key] = value
-            }
-
-            // Handle checkboxes
-            const checkboxes = e.target.querySelectorAll('input[type="checkbox"]')
-            checkboxes.forEach(checkbox => {
-                if (!formData.has(checkbox.name)) {
-                    values[checkbox.name] = false
-                }
-            })
-
-            console.log('Submitting form with values:', values)
-
-            isSubmitting = true
-            const submitBtn = document.getElementById('submit-btn')
-            submitBtn.disabled = true
-            submitBtn.textContent = 'Submitting...'
-
-            hideMessages()
-
-            try {
-                const result = await window.electronAPI.submitForm({
-                    ...currentFormData,
-                    values
-                })
-
-                // The result will be handled by the onFormResult listener
-            } catch (error) {
-                console.error('Form submission error:', error)
-                isSubmitting = false
-                submitBtn.disabled = false
-                submitBtn.textContent = 'Submit'
-                showError('Failed to submit form: ' + error.message)
-            }
-        })
-
-        document.getElementById('cancel-btn').addEventListener('click', () => {
-            window.close()
-        })
-
-        function showResultModal(resultText) {
-            const modal = document.getElementById('result-modal')
-            const resultTextArea = document.getElementById('result-text')
-
-            resultTextArea.value = resultText
-            modal.style.display = 'flex'
-
-            // Focus the textarea and select all text
-            setTimeout(() => {
-                resultTextArea.focus()
-                resultTextArea.select()
-            }, 100)
-        }
-
-        function closeResultModal() {
-            const modal = document.getElementById('result-modal')
-            modal.style.display = 'none'
-            window.close()
-        }
-
-        function copyToClipboard() {
-            const resultTextArea = document.getElementById('result-text')
-            resultTextArea.select()
-
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(resultTextArea.value).then(() => {
-                    showCopySuccess()
-                }).catch(err => {
-                    console.error('Failed to copy text: ', err)
-                    fallbackCopyTextToClipboard(resultTextArea.value)
-                })
-            } else {
-                fallbackCopyTextToClipboard(resultTextArea.value)
-            }
-        }
-
-        function fallbackCopyTextToClipboard(text) {
-            const textArea = document.createElement('textarea')
-            textArea.value = text
-            textArea.style.top = '0'
-            textArea.style.left = '0'
-            textArea.style.position = 'fixed'
-            document.body.appendChild(textArea)
-            textArea.focus()
-            textArea.select()
-
-            try {
-                document.execCommand('copy')
-                showCopySuccess()
-            } catch (err) {
-                console.error('Fallback copy failed:', err)
-            }
-
-            document.body.removeChild(textArea)
-        }
-
-        function showCopySuccess() {
-            const copySuccess = document.getElementById('copy-success')
-            copySuccess.style.display = 'inline'
-            setTimeout(() => {
-                copySuccess.style.display = 'none'
-            }, 2000)
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message')
-            errorDiv.textContent = message
-            errorDiv.style.display = 'block'
-        }
-
-        function showSuccess(message) {
-            const successDiv = document.getElementById('success-message')
-            successDiv.textContent = message
-            successDiv.style.display = 'block'
-        }
-
-        function hideMessages() {
-            document.getElementById('error-message').style.display = 'none'
-            document.getElementById('success-message').style.display = 'none'
-        }
-
-        // Handle window close
-        window.addEventListener('beforeunload', (e) => {
-            if (isSubmitting) {
-                e.preventDefault()
-                e.returnValue = 'Form is being submitted. Are you sure you want to close?'
-            }
-        })
-
-        // Handle keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (document.getElementById('result-modal').style.display === 'flex') {
-                    closeResultModal()
-                } else {
-                    window.close()
-                }
-            }
-
-            if (e.ctrlKey || e.metaKey) {
-                if (e.key === 'Enter' && !isSubmitting) {
-                    document.getElementById('form').dispatchEvent(new Event('submit'))
-                }
-            }
-        })
-
-        // Window control functions for borderless window
         function minimizeWindow() {
-            if (window.electronAPI && window.electronAPI.minimizeWindow) {
+            if (window.electronAPI) {
                 window.electronAPI.minimizeWindow()
             }
         }
 
         function closeWindow() {
-            if (window.electronAPI && window.electronAPI.closeWindow) {
+            if (window.electronAPI) {
                 window.electronAPI.closeWindow()
-            } else {
-                window.close()
             }
         }
-
-        console.log('Form window loaded and ready')
     </script>
-    </div>
+    <script type="module" src="js/form.js"></script>
 </body>
 </html>

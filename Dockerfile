@@ -6,12 +6,13 @@ WORKDIR /project
 
 # Copy package files
 COPY package.json package-lock.json* ./
+COPY electron-builder.yml ./
+COPY dist/ ./
+
 
 # Install dependencies
 RUN npm install
 
-# Copy source code
-COPY . .
 
 # Create a user with the same UID/GID as the host user to avoid permission issues
 # The user ID will be passed as a build argument
@@ -23,6 +24,14 @@ RUN groupadd -g $GROUP_ID -o appuser || true && \
 # Create cache directories and change ownership
 RUN mkdir -p /tmp/.cache/electron /tmp/.cache/electron-builder && \
     chown -R appuser:appuser /project /tmp/.cache
+
+# #RUN find . -path ./node_modules -prune -o -print
+# RUN ls -la .
+
+# # Fix ownership of all copied files
+# RUN chown -R appuser:appuser /project
+
+# RUN ls -la .
 
 # Switch to the appuser for all subsequent operations
 USER appuser

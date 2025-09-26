@@ -24,6 +24,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Show open dialog
   showOpenDialog: (options) => ipcRenderer.invoke('show-open-dialog', options),
 
+  // Send raw message to main process
+  onRawMessage: (callback) => ipcRenderer.on('raw-message', callback),
+
   // Get platform info
   platform: process.platform,
 
@@ -38,7 +41,25 @@ contextBridge.exposeInMainWorld('electronAPI', {
   minimizeWindow: () => ipcRenderer.send('window-minimize'),
   closeWindow: () => ipcRenderer.send('window-close'),
 
-  // WebSocket bridge for setup window
-  sendToStreamDeck: (data) => ipcRenderer.invoke('send-to-streamdeck', data),
-  onStreamDeckMessage: (callback) => ipcRenderer.on('streamdeck-message', (event, data) => callback({ data }))
+  // Setup window Stream Deck bridge
+  setupSendToStreamDeck: (message) => ipcRenderer.invoke('setup-send-to-streamdeck', message),
+  onSetupContextData: (callback) => ipcRenderer.on('setup-context-data', (event, data) => callback(data)),
+  onSetupSettingsUpdate: (callback) => ipcRenderer.on('setup-settings-update', (event, data) => callback(data)),
+
+  // Settings management
+  getSettings: (contextId) => ipcRenderer.invoke('get-settings', contextId),
+
+  // OAuth2 flows
+  oauthStartAuthCode: (params) => ipcRenderer.invoke('oauth-start-auth-code', params),
+  oauthClientCredentialsToken: (params) => ipcRenderer.invoke('oauth-client-credentials-token', params),
+  oauthStartCallbackServer: (params) => ipcRenderer.invoke('oauth-start-callback-server', params),
+  oauthStopCallbackServer: () => ipcRenderer.invoke('oauth-stop-callback-server'),
+  openExternalUrl: (url) => ipcRenderer.invoke('open-external-url', url),
+  onOAuthToken: (callback) => ipcRenderer.on('oauth-token', (event, data) => callback(data)),
+
+  // Raw message listener (for debugging Stream Deck messages)
+  onRawMessage: (callback) => ipcRenderer.on('raw-message', (event, message) => callback(event, message)),
+
+  // Electron logging system
+  onElectronLog: (callback) => ipcRenderer.on('electron-log', (event, logData) => callback(logData))
 })

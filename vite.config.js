@@ -3,9 +3,6 @@ import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import path from "path"
 
-// Plugin folder name based on the UUID from manifest.json
-const pluginFolderName = 'com.leandro-menezes.formbuilder.sdPlugin'
-
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -22,16 +19,15 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'src/js/main.jsx'),
         pi: resolve(__dirname, 'src/js/pi.jsx'),
-        setup: resolve(__dirname, 'src/js/setup.jsx')
+        setup: resolve(__dirname, 'src/js/setup.jsx'),
+        form: resolve(__dirname, 'src/js/form.jsx')
       },
       output: {
-        entryFileNames: `${pluginFolderName}/js/[name].js`,
-        chunkFileNames: `${pluginFolderName}/js/[name]-[hash].js`,
-        assetFileNames: `${pluginFolderName}/assets/[name][extname]`,
+        entryFileNames: `js/[name].js`,
+        chunkFileNames: `js/[name]-[hash].js`,
+        assetFileNames: `assets/[name][extname]`,
         format: 'es',
-      },
-      maxParallelFileOps: 1,
-      experimentalMinChunkSize: 0
+      }
     },
     outDir: 'dist',
     emptyOutDir: true,

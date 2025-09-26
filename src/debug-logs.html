@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Logs - Stream Deck Form Builder</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .header {
+            background: #2d2d30;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border-left: 4px solid #007acc;
+        }
+        
+        .logs-container {
+            background: #0d1117;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #30363d;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 6px;
+            border-radius: 3px;
+            word-wrap: break-word;
+        }
+        
+        .log-debug {
+            color: #7c3aed;
+            background: rgba(124, 58, 237, 0.1);
+        }
+        
+        .log-info {
+            color: #06b6d4;
+            background: rgba(6, 182, 212, 0.1);
+        }
+        
+        .log-warn {
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .log-error {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .timestamp {
+            color: #6b7280;
+            font-size: 10px;
+        }
+        
+        .controls {
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: #374151;
+            color: #e0e0e0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            background: #4b5563;
+        }
+        
+        .filter {
+            margin-left: 10px;
+        }
+        
+        .filter input {
+            margin-right: 5px;
+        }
+        
+        pre {
+            margin: 5px 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🐛 Debug Logs</h1>
+        <p>Real-time logs from Stream Deck Form Builder main process</p>
+    </div>
+    
+    <div class="controls">
+        <button class="btn" onclick="clearLogs()">Clear Logs</button>
+        <button class="btn" onclick="exportLogs()">Export Logs</button>
+        
+        <span class="filter">
+            <label><input type="checkbox" id="debug" checked> Debug</label>
+            <label><input type="checkbox" id="info" checked> Info</label>
+            <label><input type="checkbox" id="warn" checked> Warn</label>
+            <label><input type="checkbox" id="error" checked> Error</label>
+        </span>
+    </div>
+    
+    <div class="logs-container" id="logs">
+        <div class="log-entry log-info">
+            <span class="timestamp">[${new Date().toISOString()}]</span>
+            <strong>[INFO]</strong> Debug log viewer initialized. Waiting for Electron logs...
+        </div>
+    </div>
+
+    <script>
+        const logsContainer = document.getElementById('logs');
+        const allLogs = [];
+        
+        function addLog(logData) {
+            allLogs.push(logData);
+            
+            if (shouldShowLog(logData.level)) {
+                displayLog(logData);
+            }
+            
+            // Auto-scroll to bottom
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+            
+            // Limit to 1000 logs to prevent memory issues
+            if (allLogs.length > 1000) {
+                allLogs.shift();
+            }
+        }
+        
+        function shouldShowLog(level) {
+            return document.getElementById(level)?.checked || false;
+        }
+        
+        function displayLog(logData) {
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${logData.level}`;
+            
+            const timestamp = document.createElement('span');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = `[${new Date(logData.timestamp).toLocaleTimeString()}]`;
+            
+            const levelSpan = document.createElement('strong');
+            levelSpan.textContent = `[${logData.level.toUpperCase()}]`;
+            
+            const messageSpan = document.createElement('pre');
+            messageSpan.textContent = logData.message;
+            
+            logEntry.appendChild(timestamp);
+            logEntry.appendChild(document.createTextNode(' '));
+            logEntry.appendChild(levelSpan);
+            logEntry.appendChild(document.createTextNode(' '));
+            logEntry.appendChild(messageSpan);
+            
+            // Add args if present
+            if (logData.args) {
+                const argsDiv = document.createElement('pre');
+                argsDiv.textContent = logData.args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                ).join(' ');
+                argsDiv.style.marginLeft = '20px';
+                argsDiv.style.color = '#9ca3af';
+                logEntry.appendChild(argsDiv);
+            }
+            
+            logsContainer.appendChild(logEntry);
+        }
+        
+        function clearLogs() {
+            logsContainer.innerHTML = '';
+            allLogs.length = 0;
+        }
+        
+        function exportLogs() {
+            const logText = allLogs.map(log => 
+                `[${log.timestamp}] [${log.level.toUpperCase()}] ${log.message}${
+                    log.args ? ' ' + log.args.join(' ') : ''
+                }`
+            ).join('\n');
+            
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `streamdeck-logs-${new Date().toISOString().slice(0,19)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function refreshLogs() {
+            logsContainer.innerHTML = '';
+            allLogs.forEach(log => {
+                if (shouldShowLog(log.level)) {
+                    displayLog(log);
+                }
+            });
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+        
+        // Add event listeners for checkboxes
+        ['debug', 'info', 'warn', 'error'].forEach(level => {
+            document.getElementById(level).addEventListener('change', refreshLogs);
+        });
+        
+        // Listen for logs from Electron
+        if (window.electronAPI && window.electronAPI.onElectronLog) {
+            window.electronAPI.onElectronLog(addLog);
+            console.log('Debug viewer connected to Electron logs');
+        } else {
+            console.error('electronAPI not available - logs will not be received');
+        }
+    </script>
+</body>
+</html>

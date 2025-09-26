@@ -26,7 +26,6 @@
   "Category": "Forms",
   "CategoryIcon": "assets/formIcon",
   "URL": "https://github.com/leandro-menezes/stream-deck-form-builder",
-  "PropertyInspectorPath": "setup.html",
   "Version": "1.0.0",
   "OS": [
     {

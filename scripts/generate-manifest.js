@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename)
 // For now, it just copies the template
 async function generateManifest() {
   const sourceManifest = path.join(__dirname, '..', 'src', 'manifest.json')
-  const destManifest = path.join(__dirname, '..', 'dist', 'com.leandro-menezes.formbuilder.sdPlugin', 'manifest.json')
+  const destManifest = path.join(__dirname, '..', 'dist')
 
   // Ensure destination directory exists
   await fs.ensureDir(path.dirname(destManifest))

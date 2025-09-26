@@ -2,6 +2,8 @@
 
 # Docker build script for Stream Deck Form Builder
 # This script builds the Electron app using Wine in Docker
+# Note: React assets are prepared by npm run prepare-electron-assets
+npm run build 
 
 set -e
 
@@ -10,6 +12,8 @@ echo "🐳 Building Stream Deck Form Builder with Docker + Wine..."
 # Build Docker image
 echo "📦 Building Docker image..."
 docker build \
+  --no-cache \
+  --progress=plain \
   --build-arg USER_ID=$(id -u) \
   --build-arg GROUP_ID=$(id -g) \
   -t stream-deck-form-builder .
@@ -21,26 +25,14 @@ mkdir -p ~/.cache/electron-builder
 # Create output directory with correct permissions
 mkdir -p dist-electron
 
-# Prepare files for electron-builder
-echo "📋 Preparing files for electron-builder..."
-cp src/FormBuilder.exe.cjs FormBuilder.exe.cjs
-cp src/preload.js preload.js
-cp src/form.html form.html
-cp src/setup.html setup.html
-cp src/pi.html pi.html
-cp src/app.html app.html
-cp src/manifest.json manifest.json
-cp -r src/assets assets
-cp -r src/css css
+# Files are now copied inside the Docker container via Dockerfile
 
 # Build the Electron app
 echo "🔧 Building Electron app..."
 docker run --rm -ti \
- --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS_TAG|TRAVIS|TRAVIS_REPO_|TRAVIS_BUILD_|TRAVIS_BRANCH|TRAVIS_PULL_REQUEST_|APPVEYOR_|CSC_|GH_|GITHUB_|BT_|AWS_|STRIP|BUILD_') \
  --env ELECTRON_CACHE="/tmp/.cache/electron" \
  --env ELECTRON_BUILDER_CACHE="/tmp/.cache/electron-builder" \
- -v ${PWD}:/project \
- -v ${PWD##*/}-node-modules:/project/node_modules \
+ -v ${PWD}/dist-electron:/project/dist-electron \
  -v ~/.cache/electron:/tmp/.cache/electron \
  -v ~/.cache/electron-builder:/tmp/.cache/electron-builder \
  --name stream-deck-form-builder-container \
@@ -59,20 +51,17 @@ if [ -f "dist-electron/win-unpacked/Stream Deck Form Builder.exe" ]; then
     
     # Copy the entire unpacked directory contents to plugin directory
     echo "📋 Copying all unpacked files to plugin directory..."
-    cp -r "dist-electron/win-unpacked/"* "dist/com.leandro-menezes.formbuilder.sdPlugin/"
+    cp -r "dist-electron/win-unpacked/"* "dist/"
     
     # Rename the main executable to FormBuilder.exe
-    mv "dist/com.leandro-menezes.formbuilder.sdPlugin/Stream Deck Form Builder.exe" "dist/com.leandro-menezes.formbuilder.sdPlugin/FormBuilder.exe"
+    mv "dist/Stream Deck Form Builder.exe" "dist/FormBuilder.exe"
     echo "📋 Copied all executable files and DLLs to plugin directory"
 
-    # Clean up copied files (keep only the final executable and DLLs)
-    echo "🧹 Cleaning up temporary files..."
-    rm -f FormBuilder.exe.cjs preload.js form.html setup.html pi.html app.html manifest.json
-    rm -rf assets css
+    # No cleanup needed since files are handled inside Docker container
     
     # Clean up build artifacts
     echo "🧹 Cleaning up build artifacts..."
-    rm -rf dist-electron/
+    #rm -rf dist-electron/
 
     # Package the plugin (without rebuilding electron)
     echo "📦 Creating final plugin package..."

@@ -5,12 +5,9 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Plugin folder name (same as in vite.config.js)
-const pluginFolderName = 'com.leandro-menezes.formbuilder.sdPlugin'
-
 async function copyAssets() {
   const sourceDir = path.join(__dirname, '..', 'src')
-  const destDir = path.join(__dirname, '..', 'dist', 'com.leandro-menezes.formbuilder.sdPlugin')
+  const destDir = path.join(__dirname, '..', 'dist')
 
   // Ensure destination directory exists
   await fs.ensureDir(destDir)
@@ -20,6 +17,7 @@ async function copyAssets() {
   await fs.copy(path.join(sourceDir, 'pi.html'), path.join(destDir, 'pi.html'))
   await fs.copy(path.join(sourceDir, 'setup.html'), path.join(destDir, 'setup.html'))
   await fs.copy(path.join(sourceDir, 'form.html'), path.join(destDir, 'form.html'))
+  await fs.copy(path.join(sourceDir, 'debug-logs.html'), path.join(destDir, 'debug-logs.html'))
 
   // Copy manifest.json
   await fs.copy(path.join(sourceDir, 'manifest.json'), path.join(destDir, 'manifest.json'))
@@ -30,21 +28,14 @@ async function copyAssets() {
   // Copy CSS
   await fs.copy(path.join(sourceDir, 'css'), path.join(destDir, 'css'))
 
-  // Copy chunk JS files from dist/assets to plugin js directory
-  const buildAssetsDir = path.join(__dirname, '..', 'dist', 'assets')
-  
-  if (await fs.pathExists(buildAssetsDir)) {
-    const files = await fs.readdir(buildAssetsDir)
-    for (const file of files) {
-      if (file.endsWith('.js')) {
-        await fs.copy(
-          path.join(buildAssetsDir, file), 
-          path.join(destDir, 'js', file)
-        )
-        console.log(`Copied chunk: ${file}`)
-      }
-    }
-  }
+  // Copy components (UI components for React)
+  await fs.copy(path.join(sourceDir, 'components'), path.join(destDir, 'components'))
+
+  // Copy lib (utility functions)
+  await fs.copy(path.join(sourceDir, 'lib'), path.join(destDir, 'lib'))
+
+  // Other JS files are already built by Vite directly to the correct location
+  // dist/com.leandro-menezes.formbuilder.sdPlugin/js/ - no copying needed
 
   // Copy Electron files
   await fs.copy(path.join(sourceDir, 'FormBuilder.exe.cjs'), path.join(destDir, 'FormBuilder.exe.cjs'))
