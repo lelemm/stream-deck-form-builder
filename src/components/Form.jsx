@@ -362,7 +362,7 @@ function Form() {
               <CardContent className="space-y-4">
                 {typeof resultModal === 'object' ? (
                   <div className="min-h-[300px] text-sm">
-                    <JsonView src={resultModal} />
+                    <JsonView src={resultModal} className="dark" />
                   </div>
                 ) : (
                   <Textarea
