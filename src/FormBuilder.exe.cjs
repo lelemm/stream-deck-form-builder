@@ -40,7 +40,9 @@ class StreamDeckConnector {
     this.currentSetupContext = null
     this.oauthCallbackServer = null
     this.oauthCallbackState = null
-    
+    this.lastModalContext = null
+    this.lastModalSettings = null
+
     // Parse command line arguments for .exe plugin registration
     this.parseCommandLineArgs()
   }
@@ -206,8 +208,23 @@ class StreamDeckConnector {
           const contextData = this.settings[context]
           this.sendLogToMainWindow('info', 'Button pressed with settings:', contextData.settings)
 
-          // Show form modal with the settings
-          this.showFormModal(contextData.settings)
+          // Check if this is a toggle action (same settings as last modal)
+          const settingsJson = JSON.stringify(contextData.settings)
+          const lastSettingsJson = JSON.stringify(this.lastModalSettings || {})
+
+          if (this.lastModalContext === context && settingsJson === lastSettingsJson && formWindow && !formWindow.isDestroyed() && formWindow.isVisible()) {
+            // Same context and settings as last modal - close it (toggle off)
+            this.sendLogToMainWindow('info', 'Toggling modal closed - same settings as last call')
+            this.closeFormModal()
+          } else {
+            // Different settings or no modal open - show modal (toggle on)
+            this.sendLogToMainWindow('info', 'Opening modal with new settings')
+            this.showFormModal(contextData.settings)
+
+            // Track the opened modal for next toggle
+            this.lastModalContext = context
+            this.lastModalSettings = JSON.parse(settingsJson) // Deep copy
+          }
         }
       } else if (event === 'willAppear') {
         // Action appeared on Stream Deck
@@ -302,6 +319,20 @@ class StreamDeckConnector {
     this.logMessage('Form button pressed with settings: ' + JSON.stringify(settings))
     // Update tray menu reflecting visible windows
     this.updateTrayMenu()
+  }
+
+  closeFormModal() {
+    if (formWindow && !formWindow.isDestroyed()) {
+      formWindow.hide()
+      this.logMessage('Form modal closed/hidden')
+
+      // Clear the tracking when modal is closed
+      this.lastModalContext = null
+      this.lastModalSettings = null
+
+      // Update tray menu
+      this.updateTrayMenu()
+    }
   }
 
   showSetupWindow(contextToEdit) {
@@ -435,7 +466,12 @@ class StreamDeckConnector {
       this.updateTrayMenu()
     })
     formWindow.on('show', () => this.updateTrayMenu())
-    formWindow.on('hide', () => this.updateTrayMenu())
+    formWindow.on('hide', () => {
+      this.updateTrayMenu()
+      // Clear modal tracking when form window is hidden
+      this.lastModalContext = null
+      this.lastModalSettings = null
+    })
   }
 
   createSetupWindow() {
