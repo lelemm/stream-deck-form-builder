@@ -300,6 +300,8 @@ class StreamDeckConnector {
 
     // Log the action
     this.logMessage('Form button pressed with settings: ' + JSON.stringify(settings))
+    // Update tray menu reflecting visible windows
+    this.updateTrayMenu()
   }
 
   showSetupWindow(contextToEdit) {
@@ -342,6 +344,8 @@ class StreamDeckConnector {
 
     // Log the action
     this.logMessage('Setup window opened')
+    // Update tray menu reflecting visible windows
+    this.updateTrayMenu()
   }
 
   showDebugWindow() {
@@ -372,6 +376,8 @@ class StreamDeckConnector {
 
     // Log the action
     this.logMessage('Debug window opened')
+    // Update tray menu reflecting visible windows
+    this.updateTrayMenu()
   }
 
   createAllWindows() {
@@ -426,7 +432,10 @@ class StreamDeckConnector {
     formWindow.on('closed', () => {
       safeLog('Form window closed')
       formWindow = null
+      this.updateTrayMenu()
     })
+    formWindow.on('show', () => this.updateTrayMenu())
+    formWindow.on('hide', () => this.updateTrayMenu())
   }
 
   createSetupWindow() {
@@ -475,7 +484,10 @@ class StreamDeckConnector {
     setupWindow.on('closed', () => {
       safeLog('Setup window closed')
       setupWindow = null
+      this.updateTrayMenu()
     })
+    setupWindow.on('show', () => this.updateTrayMenu())
+    setupWindow.on('hide', () => this.updateTrayMenu())
   }
 
   createDebugWindow() {
@@ -522,7 +534,10 @@ class StreamDeckConnector {
     debugWindow.on('closed', () => {
       safeLog('Debug window closed')
       debugWindow = null
+      this.updateTrayMenu()
     })
+    debugWindow.on('show', () => this.updateTrayMenu())
+    debugWindow.on('hide', () => this.updateTrayMenu())
 
     // Setup IPC handlers (only once)
     this.setupIPCHandlers()
