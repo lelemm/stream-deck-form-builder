@@ -299,7 +299,7 @@ function Form() {
 
             <div className="space-y-6">
               {formData.fields?.map(field => (
-                <div key={field.name} className="space-y-2">
+                <div key={field.name} className="space-y-2 flex flex-col">
                   <Label htmlFor={field.name} className="text-sm font-medium">
                     {field.label}
                     {field.required && <span className="text-destructive ml-1">*</span>}
