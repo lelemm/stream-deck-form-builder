@@ -121,6 +121,7 @@
             gap: 8px;
             -webkit-app-region: no-drag;
         }
+
         
         .control-button {
             width: 12px;
@@ -253,12 +254,13 @@
             console.log('Electron API not available')
         }
 
+
         function minimizeWindow() {
             if (window.electronAPI) {
                 window.electronAPI.minimizeWindow()
             }
         }
-        
+
         function closeWindow() {
             if (window.electronAPI) {
                 window.electronAPI.closeWindow()

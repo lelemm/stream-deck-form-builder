@@ -300,20 +300,13 @@ class StreamDeckConnector {
       formWindow.restore()
     }
     
+    // Set always on top BEFORE showing to ensure it appears above fullscreen apps
+    formWindow.setAlwaysOnTop(true, 'screen-saver')
+    
     // Force window to front with multiple methods
     formWindow.show()
     formWindow.focus()
     formWindow.moveTop()
-    
-    // Temporarily set always on top to ensure it comes forward
-    formWindow.setAlwaysOnTop(true)
-    
-    // Remove always on top after a short delay
-    setTimeout(() => {
-      if (formWindow && !formWindow.isDestroyed()) {
-        formWindow.setAlwaysOnTop(false)
-      }
-    }, 1000)
 
     // Log the action
     this.logMessage('Form button pressed with settings: ' + JSON.stringify(settings))
@@ -323,6 +316,8 @@ class StreamDeckConnector {
 
   closeFormModal() {
     if (formWindow && !formWindow.isDestroyed()) {
+      // Remove always on top before hiding
+      formWindow.setAlwaysOnTop(false)
       formWindow.hide()
       this.logMessage('Form modal closed/hidden')
 
@@ -434,13 +429,14 @@ class StreamDeckConnector {
       resizable: true,
       minimizable: true,
       maximizable: false, // Disable maximize as requested
-      alwaysOnTop: false,
+      alwaysOnTop: false, // Will be set to true when opened via keyUp
       icon: path.join(__dirname, 'assets', 'formIcon.png'),
       skipTaskbar: false, // Show in taskbar when visible
       title: 'Stream Deck Form Builder - Form',
       titleBarStyle: 'hidden',
       visualEffectState: 'active',
-      backgroundMaterial: 'acrylic'
+      backgroundMaterial: 'acrylic',
+      fullscreenable: false // Prevent fullscreen to work better with always-on-top
     })
     
     // Hide to system tray instead of closing
@@ -467,6 +463,10 @@ class StreamDeckConnector {
     })
     formWindow.on('show', () => this.updateTrayMenu())
     formWindow.on('hide', () => {
+      // Remove always on top when window is hidden
+      if (formWindow && !formWindow.isDestroyed()) {
+        formWindow.setAlwaysOnTop(false)
+      }
       this.updateTrayMenu()
       // Clear modal tracking when form window is hidden
       this.lastModalContext = null

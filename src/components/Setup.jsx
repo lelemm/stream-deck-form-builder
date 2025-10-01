@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Copy, Check } from "lucide-react"
+import { Copy, Check, Download, Upload } from "lucide-react"
 // Removed Toggle in favor of Switch
 import '../css/app.css'
 import { Switch } from "@/components/ui/switch"
@@ -170,10 +170,10 @@ function Setup() {
           }
         }
       }
-      
+
       setFormConfig(resetConfig)
       setActiveTab('basic')
-      
+
       // Clear settings from Stream Deck as well
       try {
         if (window.electronAPI && window.currentContext) {
@@ -182,7 +182,7 @@ function Setup() {
             context: window.currentContext,
             payload: { formBuilderConfig: resetConfig }
           }
-          
+
           console.log('Resetting settings in Stream Deck for context:', window.currentContext)
           await window.electronAPI.setupSendToStreamDeck(setSettings)
         }
@@ -190,6 +190,65 @@ function Setup() {
         console.error('Error resetting Stream Deck settings:', err)
       }
     }
+  }
+
+  const handleExportConfig = () => {
+    try {
+      const jsonString = JSON.stringify(formConfig, null, 2)
+      const blob = new Blob([jsonString], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `streamdeck-form-config-${new Date().toISOString().split('T')[0]}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      alert('Configuration exported successfully!')
+    } catch (error) {
+      console.error('Export error:', error)
+      alert('Failed to export configuration: ' + error.message)
+    }
+  }
+
+  const handleImportConfig = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+    input.onchange = (event) => {
+      const file = event.target.files[0]
+      if (!file) return
+
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        try {
+          const importedConfig = JSON.parse(e.target.result)
+
+          // Basic validation - check if it has expected structure
+          if (typeof importedConfig !== 'object' || importedConfig === null) {
+            throw new Error('Invalid configuration format')
+          }
+
+          // Update React state
+          setFormConfig(importedConfig)
+
+          // Update global config to keep everything in sync
+          window.globalFormConfig = importedConfig
+
+          // Switch to review tab to show the imported config
+          setActiveTab('review')
+
+          alert('Configuration imported successfully!')
+        } catch (error) {
+          console.error('Import error:', error)
+          alert('Failed to import configuration: ' + error.message)
+        }
+      }
+      reader.readAsText(file)
+    }
+    input.click()
   }
 
   const renderBasicConfig = () => (
@@ -619,9 +678,21 @@ function Setup() {
               />
             </svg>
           </div>
-          <div className="flex flex-row gap-2">
-            <h1 className="text-3xl font-bold tracking-tight">Form Builder Setup</h1>
-            <p className="text-muted-foreground">Configure your custom form and API endpoint</p>
+          <div className="flex flex-row gap-2 flex-1">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Form Builder Setup</h1>
+              <p className="text-muted-foreground">Configure your custom form and API endpoint</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleImportConfig} className="flex items-center gap-2">
+              <Upload className="h-4 w-4" />
+              Import
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportConfig} className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
           </div>
         </div>
 

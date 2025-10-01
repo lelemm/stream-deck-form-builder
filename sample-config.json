@@ -1,0 +1,62 @@
+{
+  "title": "Sample Contact Form",
+  "url": "https://api.example.com/contact",
+  "method": "POST",
+  "outputType": "status",
+  "submitButtonText": "Send Message",
+  "fields": [
+    {
+      "name": "name",
+      "label": "Full Name",
+      "type": "text",
+      "required": true,
+      "sendAs": "body"
+    },
+    {
+      "name": "email",
+      "label": "Email Address",
+      "type": "email",
+      "required": true,
+      "sendAs": "body"
+    },
+    {
+      "name": "message",
+      "label": "Message",
+      "type": "textarea",
+      "required": true,
+      "sendAs": "body"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    },
+    {
+      "key": "X-API-Key",
+      "value": "your-api-key-here"
+    }
+  ],
+  "auth": {
+    "type": "oauth2_client_credentials",
+    "oauth": {
+      "authorizationUrl": "",
+      "tokenUrl": "https://auth.example.com/oauth/token",
+      "clientId": "your-client-id",
+      "clientSecret": "your-client-secret",
+      "scope": "api.write",
+      "authPlacement": "header",
+      "redirectUrl": "",
+      "saveRefreshToken": false,
+      "token": null
+    },
+    "clientCredentials": {
+      "tokenUrl": "https://auth.example.com/oauth/token",
+      "clientId": "your-client-id",
+      "clientSecret": "your-client-secret",
+      "scope": "api.write",
+      "authPlacement": "header",
+      "token": null
+    }
+  }
+}
